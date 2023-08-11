@@ -17,6 +17,7 @@ STRUCTURE_PARAMETERS = {
     "gr-b": ["ci", "cp", "cft", "exc", "lr"],
     "gr-c": ["ci", "cp", "cft", "cst", "exc", "lr"],
     "gr-d": ["cp", "cft", "lr"],
+    "gr-g": ["ci", "cp", "cft", "exc"],
     "vic-a": ["b", "cusl1", "cusl2", "clsl", "ks", "ds", "dsm", "ws", "lr"],
 }
 
@@ -25,6 +26,7 @@ STRUCTURE_STATES = {
     "gr-b": ["hi", "hp", "hft", "hlr"],
     "gr-c": ["hi", "hp", "hft", "hst", "hlr"],
     "gr-d": ["hp", "hft", "hlr"],
+    "gr-g": ["hi", "hp", "hft",],
     "vic-a": ["husl1", "husl2", "hlsl"],
 }
 
@@ -33,6 +35,7 @@ STRUCTURE_ADJUST_CI = {
     "gr-b": True,
     "gr-c": True,
     "gr-d": False,
+    "gr-g": True,
     "vic-a": False,
 }
 

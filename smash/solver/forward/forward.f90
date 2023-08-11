@@ -8,7 +8,7 @@ subroutine base_forward(setup, mesh, input_data, parameters, parameters_bgd, sta
     use mwd_states !% only: StatesDT
     use mwd_output !% only: OutputDT
     use mwd_cost !% only: compute_cost
-    use md_forward_structure !% only: gr_a_forward, gr_b_forward, gr_c_forward, gr_d_forward, vic_a_forward
+    use md_forward_structure !% only: gr_a_forward, gr_b_forward, gr_c_forward, gr_d_forward, gr_g_forward, vic_a_forward
     use mwd_parameters_manipulation !% only: denormalize_parameters
     use mwd_states_manipulation !% only: denormalize_states
 
@@ -57,6 +57,10 @@ subroutine base_forward(setup, mesh, input_data, parameters, parameters_bgd, sta
     case ("gr-d")
 
         call gr_d_forward(setup, mesh, input_data, parameters, states, output)
+    
+    case ("gr-g")
+
+        call gr_g_forward(setup, mesh, input_data, parameters, states, output)
 
     case ("vic-a")
 
