@@ -3,7 +3,7 @@ FC := gfortran
 CC := gcc
 
 #% Compiler flags
-F90_FLAGS := -cpp -O3 -march=native -funroll-loops -fPIC -fopenmp
+F90_FLAGS := -cpp -O3 -march=native -funroll-loops -ffast-math -fPIC -fopenmp
 debug: F90_FLAGS := -Wall -Wextra -fPIC -fopenmp -fmax-errors=1 -cpp -g -fcheck=all -fbacktrace -fcheck-array-temporaries
 F77_FLAGS := -O3 -march=native -funroll-loops -fPIC -fopenmp
 C_FLAGS := -g -O3 -march=native -fPIC -fopenmp

@@ -17,7 +17,7 @@ bd:
 	-adjvarname %_b \
 	-tgtvarname %_d \
 	-o forward \
-	-head "base_forward(parameters, states)\(cost)" \
+	-head "base_forward(parameters, states)\(cost) base_forward(parameters, states)\(output%qsim_domain)" \
 	-head "base_hyper_forward(hyper_parameters, hyper_states)\(cost)" \
 	-O $(PWD) $(FILES)
 

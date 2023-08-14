@@ -7,9 +7,11 @@ module mw_forward
     use mwd_setup, only: SetupDT
     use mwd_mesh, only: MeshDT
     use mwd_input_data, only: Input_DataDT
-    use mwd_parameters, only: ParametersDT, Hyper_ParametersDT
-    use mwd_states, only: StatesDT, Hyper_StatesDT
-    use mwd_output, only: OutputDT
+    use mwd_parameters, only: ParametersDT_initialise, ParametersDT, Hyper_ParametersDT
+    use mwd_states, only: StatesDT_initialise, StatesDT, Hyper_StatesDT
+    use mwd_output, only: OutputDT_initialise, OutputDT
+    use mwd_parameters_manipulation, only: normalize_parameters
+    use mwd_states_manipulation, only: normalize_states
 
     implicit none
 
@@ -47,6 +49,15 @@ contains
         !% -----
         !%
         !% Wrapping base_forward_b
+        !% Gradient of useful results: cost
+        !% with respect to varying inputs: *(parameters.ci) *(parameters.cp)
+        !%                *(parameters.beta) *(parameters.cft) *(parameters.cst)
+        !%                *(parameters.alpha) *(parameters.exc) *(parameters.b)
+        !%                *(parameters.cusl1) *(parameters.cusl2) *(parameters.clsl)
+        !%                *(parameters.ks) *(parameters.ds) *(parameters.dsm)
+        !%                *(parameters.ws) *(parameters.lr) *(states.hi)
+        !%                *(states.hp) *(states.hft) *(states.hst) *(states.husl1)
+        !%                *(states.husl2) *(states.hlsl) *(states.hlr)
 
         implicit none
 
@@ -66,6 +77,171 @@ contains
         & cost, cost_b)
 
     end subroutine forward_b
+
+
+    subroutine wrapped_forward_b(setup, mesh, input_data, parameters, parameters_b, &
+        &  states, states_b, output, cost)
+
+        !% Notes
+        !% -----
+        !%
+        !% Wrapping base_forward_b
+        !% Gradient of useful results: cost
+        !% with respect to varying inputs: *(parameters.ci) *(parameters.cp)
+        !%                *(parameters.beta) *(parameters.cft) *(parameters.cst)
+        !%                *(parameters.alpha) *(parameters.exc) *(parameters.b)
+        !%                *(parameters.cusl1) *(parameters.cusl2) *(parameters.clsl)
+        !%                *(parameters.ks) *(parameters.ds) *(parameters.dsm)
+        !%                *(parameters.ws) *(parameters.lr) *(states.hi)
+        !%                *(states.hp) *(states.hft) *(states.hst) *(states.husl1)
+        !%                *(states.husl2) *(states.hlsl) *(states.hlr)
+
+        implicit none
+
+        type(SetupDT), intent(inout) :: setup
+        type(MeshDT), intent(inout) :: mesh
+        type(Input_DataDT), intent(inout) :: input_data
+        type(ParametersDT), intent(inout) :: parameters
+        type(ParametersDT), intent(inout) :: parameters_b
+        type(StatesDT), intent(inout) :: states
+        type(StatesDT), intent(inout) :: states_b
+        type(OutputDT), intent(inout) :: output
+        real(sp), intent(inout) :: cost 
+
+        type(ParametersDT) :: parameters_bgd, parameters_bgd_b
+        type(StatesDT) :: states_bgd, states_bgd_b
+        type(OutputDT) :: output_b
+        real(sp) :: cost_b
+       
+        
+        call ParametersDT_initialise(parameters_bgd_b, mesh)
+        call ParametersDT_initialise(parameters_bgd, mesh)
+
+        call StatesDT_initialise(states_bgd_b, mesh)
+        call StatesDT_initialise(states_bgd, mesh)
+
+        call OutputDT_initialise(output_b, setup, mesh)
+
+        call normalize_parameters(setup, mesh, parameters)
+        call normalize_states(setup, mesh, states)
+        
+        ! Background is normalize
+        parameters_bgd = parameters
+        states_bgd = states
+        
+        cost_b = 1._sp
+        cost = 0._sp
+        
+        call base_forward_b(setup, mesh, input_data, parameters, &
+        & parameters_b, parameters_bgd, parameters_bgd_b, states, &
+        & states_b, states_bgd, states_bgd_b, output, output_b, &
+        & cost, cost_b)
+            
+            
+    end subroutine wrapped_forward_b
+
+
+    subroutine forward_b0(setup, mesh, input_data, parameters, &
+    & parameters_b, parameters_bgd, parameters_bgd_b, states, &
+    & states_b, states_bgd, states_bgd_b, output, output_b, &
+    & cost)
+
+        !% Notes
+        !% -----
+        !%
+        !% Wrapping base_forward_b0 
+        !% Gradient of useful results: *(output.qsim_domain)
+        !% with respect to varying inputs: *(parameters.ci) *(parameters.cp)
+        !%                *(parameters.beta) *(parameters.cft) *(parameters.cst)
+        !%                *(parameters.alpha) *(parameters.exc) *(parameters.b)
+        !%                *(parameters.cusl1) *(parameters.cusl2) *(parameters.clsl)
+        !%                *(parameters.ks) *(parameters.ds) *(parameters.dsm)
+        !%                *(parameters.ws) *(parameters.lr) *(states.hi)
+        !%                *(states.hp) *(states.hft) *(states.hst) *(states.husl1)
+        !%                *(states.husl2) *(states.hlsl) *(states.hlr)
+
+        implicit none
+
+        type(SetupDT), intent(in) :: setup
+        type(MeshDT), intent(in) :: mesh
+        type(Input_DataDT), intent(in) :: input_data
+        type(ParametersDT), intent(inout) :: parameters, parameters_b, &
+        & parameters_bgd, parameters_bgd_b
+        type(StatesDT), intent(inout) :: states, states_b, &
+        & states_bgd, states_bgd_b
+        type(OutputDT), intent(inout) :: output, output_b
+        real(sp), intent(inout) :: cost
+
+        call base_forward_b0(setup, mesh, input_data, parameters, &
+        & parameters_b, parameters_bgd, parameters_bgd_b, states, &
+        & states_b, states_bgd, states_bgd_b, output, output_b, &
+        & cost)
+        
+
+    end subroutine forward_b0
+
+
+
+    subroutine wrapped_forward_b0(setup, mesh, input_data, parameters, parameters_b, &
+        &  states, states_b, output, cost)
+
+        !% Notes
+        !% -----
+        !%
+        !% Wrapping base_forward_b
+        !% Gradient of useful results: cost
+        !% with respect to varying inputs: *(parameters.ci) *(parameters.cp)
+        !%                *(parameters.beta) *(parameters.cft) *(parameters.cst)
+        !%                *(parameters.alpha) *(parameters.exc) *(parameters.b)
+        !%                *(parameters.cusl1) *(parameters.cusl2) *(parameters.clsl)
+        !%                *(parameters.ks) *(parameters.ds) *(parameters.dsm)
+        !%                *(parameters.ws) *(parameters.lr) *(states.hi)
+        !%                *(states.hp) *(states.hft) *(states.hst) *(states.husl1)
+        !%                *(states.husl2) *(states.hlsl) *(states.hlr)
+
+        implicit none
+
+        type(SetupDT), intent(inout) :: setup
+        type(MeshDT), intent(inout) :: mesh
+        type(Input_DataDT), intent(inout) :: input_data
+        type(ParametersDT), intent(inout) :: parameters
+        type(ParametersDT), intent(inout) :: parameters_b
+        type(StatesDT), intent(inout) :: states
+        type(StatesDT), intent(inout) :: states_b
+        type(OutputDT), intent(inout) :: output
+        real(sp), intent(inout) :: cost
+
+        type(ParametersDT) :: parameters_bgd, parameters_bgd_b
+        type(StatesDT) :: states_bgd, states_bgd_b
+        type(OutputDT) :: output_b
+        
+        
+        call ParametersDT_initialise(parameters_bgd_b, mesh)
+        call ParametersDT_initialise(parameters_bgd, mesh)
+
+        call StatesDT_initialise(states_bgd_b, mesh)
+        call StatesDT_initialise(states_bgd, mesh)
+
+        call OutputDT_initialise(output_b, setup, mesh)
+
+        call normalize_parameters(setup, mesh, parameters)
+        call normalize_states(setup, mesh, states)
+        
+        ! Background is normalize
+        parameters_bgd = parameters
+        states_bgd = states
+        
+        cost = 0._sp
+        output_b%qsim_domain=1._sp
+        
+        call base_forward_b0(setup, mesh, input_data, parameters, &
+        & parameters_b, parameters_bgd, parameters_bgd_b, states, &
+        & states_b, states_bgd, states_bgd_b, output, output_b, &
+        & cost)
+        
+        
+        end subroutine wrapped_forward_b0
+
 
     subroutine forward_d(setup, mesh, input_data, parameters, &
     & parameters_d, parameters_bgd, parameters_bgd_d, states, &

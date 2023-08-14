@@ -14,6 +14,8 @@ f90: \
  obj/mwd_states.o \
  obj/mwd_output.o \
  obj/mwd_parameters.o \
+ obj/mwd_parameters_manipulation.o \
+ obj/mwd_states_manipulation.o \
  obj/mw_forward.o \
  obj/md_gr_operator.o \
  obj/md_routing_operator.o \
@@ -29,8 +31,6 @@ f90: \
  obj/mw_sparse_storage.o \
  obj/mw_interception_store.o \
  obj/mw_forcing_statistic.o \
- obj/mwd_parameters_manipulation.o \
- obj/mwd_states_manipulation.o \
  obj/mwd_cost.o \
  obj/mw_multiple_run.o \
  obj/mw_optimize.o \
