@@ -227,6 +227,9 @@ contains
         call normalize_parameters(setup, mesh, parameters)
         call normalize_states(setup, mesh, states)
         
+        ! Trigger the denormalization subroutine in forward
+        setup%optimize%denormalize_forward = .true.
+        
         ! Background is normalize
         parameters_bgd = parameters
         states_bgd = states
@@ -239,6 +242,8 @@ contains
         & states_b, states_bgd, states_bgd_b, output, output_b, &
         & cost)
         
+        ! Remove the denormalization subroutine in forward
+        setup%optimize%denormalize_forward = .false.
         
         end subroutine wrapped_forward_b0
 
