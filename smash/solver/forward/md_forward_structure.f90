@@ -933,6 +933,81 @@ contains
 
         end do !% [ END DO TIME ]
 
+        ! Fortran coupled Gamma Model Here ?
+        ! Compilation ?
+        
+        ! use mod_gamma_routing_setup
+        ! use mod_gamma_routing_mesh
+        ! use mod_gamma_routing_parameters
+        ! use mod_gamma_routing_states
+        ! use mod_gamma_routing_results
+        ! use mod_gamma_function
+        ! use mod_gamma_interface
+        ! use mod_gamma_routing
+        
+        !INPUTS MUST BE READ OR SET SOMEWHERE :
+        !In a new derved type setup%coupling ?
+        ! In a new deived type parameter%coupling
+        !dt
+        !hydraulics_coefficient
+        !spreading
+        !vmin=0.1,vmax=10.,&
+        !&elongation_factor=1.0,mode_discretization_step=0.1,spreading_discretization_step=0.1,ponderation_regul=10000.0&
+        !&,velocity_computation="qm3",varying_spread=.true.
+
+!~ FROM HERE TO ..
+
+!~        npdt=int(setup._ntime_step*setup.dt/dt)
+
+!~        call routing_setup_self_initialisation(routing_setup,npdt=npdt,dt=900.,vmin=0.1,vmax=10.,&
+!~        &elongation_factor=1.0,mode_discretization_step=0.1,spreading_discretization_step=0.1,ponderation_regul=10000.0&
+!~        &,velocity_computation="qm3",varying_spread=.true.)
+        
+!~        nb_nodes=np.sum(mesh.active_cell)
+!~        nb_upstream_nodes=8 #properties of gridded mesh
+!~        routing_mesh_self_initialisation(nb_nodes=nb_nodes,nb_upstream_nodes=nb_upstream_nodes) #initialise the gamma mesh
+        
+           !Here 3 functions written in python must be translated in Fortran
+!~         VectorMesh1D=SmashMesh2DToVector(smash_model)
+!~         nodes_linker=ComputeNodeLinker(smash_model)
+!~         gauge_pos=VectorIndexesOfSmashGauges(smash_model)
+        
+!~         #Filling the Gamma mesh properties
+!~         routing_mesh%upstream_to_downstream_nodes=np.argsort(VectorMesh1D["FlowAcc"])+1
+!~         routing_mesh%nodes_linker=nodes_linker
+!~         routing_mesh%controlled_nodes=gauge_pos+1
+!~         routing_mesh%surface=(smash_model.mesh.dx)**2. / 1000.0**2.  #!km²
+!~         routing_mesh%dx=smash_model.mesh.dx
+        
+!~         #Update and finalise the gamma mesh for the model_gamma object
+!~         call mesh_update(routing_mesh)
+
+!~         call routing_parameter_self_initialisation(routing_parameter=routing_parameter,routing_setup=routing_setup,&
+!~          &routing_mesh=routing_mesh,&
+!~          &hydraulics_coefficient=0.5,spreading=1.)
+!~         call routing_state_self_initialisation(routing_setup,routing_mesh,routing_parameter,routing_states)
+!~         call compute_gamma_parameters(routing_setup,routing_mesh,routing_states)
+!~         call routing_results_self_initialisation(routing_setup,routing_mesh,routing_results)
+!~         write(*,*) "routing_hydrogram_forward..."
+!~         write(*,*) ""
+!~         allocate(observations(routing_setup%npdt,routing_mesh%nb_nodes))
+!~         observations=0.0
+!~         call routing_states_reset(routing_states)
+
+!~ .. TO HERE : DO NOT DIFFERENTIATE WITH TAPENADE
+
+!~ HOW TO MANAGE THE DIFFERENTIATION WITH RESPECT TO ROUTING_PARAMETER ? => New derived type parameters%coupling ?
+
+!~         call routing_hydrogram_forward(routing_setup,routing_mesh,routing_parameter,inflows,observations,&
+!~         &routing_states,routing_results,cost)
+
+!A ajuster
+!~     do g = 1, routing_results%controlled_nodes
+
+!~             output%qsim(g, t) = routing_results%discharges(routing_results%controlled_nodes(g, 1), routing_results%controlled_nodes(g, 2))
+
+!~     end do
+
     end subroutine gr_g_forward
 
 
