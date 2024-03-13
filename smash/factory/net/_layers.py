@@ -141,9 +141,16 @@ def _wb_initialization(layer: Layer, attr: str):
 
         setattr(layer, attr, np.random.normal(0, std, shape))
 
-    else:
+    elif split_inizer[-1] == "zeros":
         setattr(layer, attr, np.zeros(shape))
 
+    # EVERETT: case of 'none' for no initialization, if passing in a trained net for fine tuning or assimilation
+    elif split_inizer[-1] == "none":
+        if getattr(layer, attr) is None:
+            raise ValueError("'none' initializer can only be applied to pretrained Nets")
+        pass
+    else:
+        raise NotImplementedError()
 
 class Dense(Layer):
 
@@ -160,10 +167,10 @@ class Dense(Layer):
         It must be specified if this is the first layer in the network.
 
     kernel_initializer : str, default 'glorot_uniform'
-        Weight initialization method. Should be one of 'uniform', 'glorot_uniform', 'he_uniform', 'normal', 'glorot_normal', 'he_normal', 'zeros'.
+        Weight initialization method. Should be one of 'uniform', 'glorot_uniform', 'he_uniform', 'normal', 'glorot_normal', 'he_normal', 'zeros', 'none'.
 
     bias_initializer : str, default 'zeros'
-        Bias initialization method. Should be one of 'uniform', 'glorot_uniform', 'he_uniform', 'normal', 'glorot_normal', 'he_normal', 'zeros'.
+        Bias initialization method. Should be one of 'uniform', 'glorot_uniform', 'he_uniform', 'normal', 'glorot_normal', 'he_normal', 'zeros', none'.
     """
 
     # TODO: Add function check_unknown_options

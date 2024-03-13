@@ -617,14 +617,31 @@ def _ann_optimize(
     # % Preprocessing input descriptors and normalization
     active_mask = np.where(model.mesh.active_cell == 1)
 
-    l_desc = model._input_data.physio_data.l_descriptor
-    u_desc = model._input_data.physio_data.u_descriptor
 
-    desc = model._input_data.physio_data.descriptor.copy()
-    desc = (desc - l_desc) / (u_desc - l_desc)  # normalize input descriptors
+    if (optimize_options["features"] == "physio_data") | (optimize_options["features"] == "all"):
+        l_desc = model._input_data.physio_data.l_descriptor
+        u_desc = model._input_data.physio_data.u_descriptor
+        physio_data = model._input_data.physio_data.descriptor.copy()
+        physio_data = (physio_data - l_desc) / (u_desc - l_desc)  # normalize input descriptors
 
-    # % Training the network
-    x_train = desc[active_mask]
+        # % Training the network
+
+    if (optimize_options["features"] == "final_states") | (optimize_options["features"] == "all"):
+        # preprocessing final states of background model and normalizatio
+        l_states = np.array(list(model.get_rr_initial_states_bounds().values()))[:,0].copy()
+        u_states = np.array(list(model.get_rr_initial_states_bounds().values()))[:,1].copy()
+        final_states = model.rr_final_states.values.copy()
+        final_states = (final_states - l_states) / (u_states - l_states)  # normalize input descriptors
+        
+    if optimize_options["features"] == "physio_data":
+        features = physio_data
+    if optimize_options["features"] == "final_states":
+        features = final_states
+    if optimize_options["features"] == "all":
+        features = np.concatenate([final_states,physio_data], axis=2)
+        
+    x_train = features[active_mask]
+
 
     net = optimize_options["net"]
 
@@ -653,11 +670,11 @@ def _ann_optimize(
     wrap_options.optimize.mapping = "ann"
 
     # % Predicting at active and inactive cells
-    x = desc.reshape(-1, desc.shape[-1])
+    x = features.reshape(-1, features.shape[-1])
     y = net._predict(x)
 
     for i, name in enumerate(optimize_options["parameters"]):
-        y_reshape = y[:, i].reshape(desc.shape[:2])
+        y_reshape = y[:, i].reshape(features.shape[:2])
 
         if name in model.rr_parameters.keys:
             ind = np.argwhere(model.rr_parameters.keys == name).item()
@@ -667,7 +684,7 @@ def _ann_optimize(
         else:
             ind = np.argwhere(model.rr_initial_states.keys == name).item()
 
-            model.rr_inital_states.values[..., ind] = y_reshape
+            model.rr_initial_states.values[..., ind] = y_reshape
 
     # % Forward run for updating final states
     wrap_forward_run(

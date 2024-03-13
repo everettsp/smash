@@ -35,6 +35,7 @@ from smash._constant import (
     WEIGHT_ALIAS,
     GAUGE_ALIAS,
     EVENT_SEG_KEYS,
+    FEATURES,
 )
 
 from smash.core.signal_analysis.segmentation._standardize import (
@@ -318,6 +319,7 @@ def _standardize_simulation_optimize_options_net(
     ncv = len(bound_values)
 
     nd = model.setup.nd
+    ns = model.setup.nrrs
 
     active_mask = np.where(model.mesh.active_cell == 1)
     ntrain = active_mask[0].shape[0]
@@ -367,7 +369,9 @@ def _standardize_simulation_optimize_options_net(
         # % check input shape
         ips = net.layers[0].input_shape
 
-        if ips[0] != nd:
+        # check input shape against n descriptors OR n parameters OR both
+        # TODO: not perfect, ideally pass in opt. option to check which is being used
+        if (ips[0] != nd) & (ips[0] != ns) & (ips[0] != (ns + nd)):
             raise ValueError(
                 f"net optimize_options: Inconsistent value between the number of input layer ({ips[0]}) and the number of descriptors ({nd}): {ips[0]} != {nd}"
             )
@@ -375,7 +379,7 @@ def _standardize_simulation_optimize_options_net(
         # % check output shape
         ios = net.layers[-1].output_shape()
 
-        if ios[0] != ncv:
+        if (ios[0] != ncv):
             raise ValueError(
                 f"net optimize_options: Inconsistent value between the number of output layer ({ios[0]}) and the number of parameters ({ncv}): {ios[0]} != {ncv}"
             )
@@ -413,6 +417,20 @@ def _standardize_simulation_optimize_options_learning_rate(
             )
 
     return learning_rate
+
+
+def _standardize_simulation_optimize_options_features(
+        features:str, **kwargs) -> str:
+    if features is None:
+        features = "physio_data"
+    if isinstance(features, str):
+        if features.lower() in FEATURES:
+            features = features.lower()
+        else:
+            raise ValueError(
+                f"Unknown alias '{features}' for features in optimizaton_options. Choices: {FEATURES}"
+            )
+    return features
 
 
 def _standardize_simulation_optimize_options_random_state(

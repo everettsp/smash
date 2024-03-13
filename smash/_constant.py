@@ -543,6 +543,7 @@ DEFAULT_MODEL_SETUP = {
     "descriptor_format": "tif",
     "descriptor_directory": None,
     "descriptor_name": None,
+    "verbose":True,
 }
 
 
@@ -627,6 +628,7 @@ WB_INITIALIZER = [
     "glorot_normal",
     "he_normal",
     "zeros",
+    "none",
 ]
 
 LAYER_NAME = ["Dense", "Activation", "Scale", "Dropout"]
@@ -646,6 +648,11 @@ ACTIVATION_FUNCTION = [
     "SoftPlus",
 ]
 
+FEATURES = [
+    "physio_data",
+    "final_states",
+    "all",
+    ]
 
 ### EVENT SEGMENTATION ###
 ##########################
@@ -785,6 +792,7 @@ SIMULATION_OPTIMIZE_OPTIONS_KEYS = {
                     "learning_rate",
                     "random_state",
                     "termination_crit",
+                    "features",
                 ]
             ],
         )
