@@ -617,8 +617,7 @@ def _ann_optimize(
     # % Preprocessing input descriptors and normalization
     active_mask = np.where(model.mesh.active_cell == 1)
 
-
-    if (optimize_options["features"] == "physio_data") | (optimize_options["features"] == "all"):
+    if optimize_options["features"] in ["physio_data","all","product"]:
         l_desc = model._input_data.physio_data.l_descriptor
         u_desc = model._input_data.physio_data.u_descriptor
         physio_data = model._input_data.physio_data.descriptor.copy()
@@ -626,10 +625,10 @@ def _ann_optimize(
 
         # % Training the network
 
-    if (optimize_options["features"] == "final_states") | (optimize_options["features"] == "all"):
+    if optimize_options["features"] in ["final_states","all","product"]:
         # preprocessing final states of background model and normalizatio
-        l_states = np.array(list(model.get_rr_initial_states_bounds().values()))[:,0].copy()
-        u_states = np.array(list(model.get_rr_initial_states_bounds().values()))[:,1].copy()
+        l_states = np.array(list(model.get_rr_initial_states_bounds().values()))[:,0]
+        u_states = np.array(list(model.get_rr_initial_states_bounds().values()))[:,1]
         final_states = model.rr_final_states.values.copy()
         final_states = (final_states - l_states) / (u_states - l_states)  # normalize input descriptors
         
@@ -639,6 +638,8 @@ def _ann_optimize(
         features = final_states
     if optimize_options["features"] == "all":
         features = np.concatenate([final_states,physio_data], axis=2)
+    if optimize_options["features"] == "product":
+        features = np.concatenate([np.multiply(final_states,physio_data[...,ii].reshape(physio_data.shape[0],physio_data.shape[1],1)) for ii in range(physio_data.shape[-1])],axis=2)
         
     x_train = features[active_mask]
 

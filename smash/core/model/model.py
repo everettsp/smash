@@ -1535,7 +1535,7 @@ class Model:
               dtype=float32)
 
         .. note::
-            This method is equivalent to directly slicing the ``rr_inital_states.values`` array (as shown below) and change the values but is simpler and ``safer`` to use
+            This method is equivalent to directly slicing the ``rr_initial_states.values`` array (as shown below) and change the values but is simpler and ``safer`` to use
 
         Access the rainfall-runoff initial state keys
 

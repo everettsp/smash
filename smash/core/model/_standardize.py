@@ -446,6 +446,8 @@ def _standardize_model_setup_descriptor_name(
 
     return descriptor_name
 
+def _standardize_model_setup_verbose(verbose: bool, **kwrags) -> bool:
+    return _standardize_model_setup_bool("verbose", verbose)
 
 def _standardize_model_setup(setup: dict) -> dict:
     if isinstance(setup, dict):

@@ -652,6 +652,7 @@ FEATURES = [
     "physio_data",
     "final_states",
     "all",
+    "product",
     ]
 
 ### EVENT SEGMENTATION ###

@@ -371,7 +371,7 @@ def _standardize_simulation_optimize_options_net(
 
         # check input shape against n descriptors OR n parameters OR both
         # TODO: not perfect, ideally pass in opt. option to check which is being used
-        if (ips[0] != nd) & (ips[0] != ns) & (ips[0] != (ns + nd)):
+        if (ips[0] != nd) & (ips[0] != ns) & (ips[0] != (ns + nd)) & (ips[0] != (ns * nd)):
             raise ValueError(
                 f"net optimize_options: Inconsistent value between the number of input layer ({ips[0]}) and the number of descriptors ({nd}): {ips[0]} != {nd}"
             )
